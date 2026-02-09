@@ -1,0 +1,243 @@
+:root{
+  --bg:#0f1b1e;
+  --panel:#1c2b2f;
+  --panel-light:#24373d;
+  --ink:#e6f6f1;
+  --accent:#2dfcd8;
+  --shadow:#000;
+}
+
+/* RESET */
+*{
+  box-sizing:border-box;
+  image-rendering:pixelated;
+}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top, #163036, var(--bg));
+  color:var(--ink);
+  font-family:'Inter', sans-serif;
+  overflow:hidden;
+}
+
+/* CRT SCANLINES */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.03),
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+/* BOOT */
+#boot{
+  position:fixed;
+  inset:0;
+  background:black;
+  color:var(--accent);
+  font-family:'Press Start 2P';
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
+  animation:bootOut 1s ease 2.2s forwards;
+}
+
+@keyframes bootOut{
+  to{ opacity:0; pointer-events:none; }
+}
+
+/* TOP PANEL */
+#top-panel{
+  height:64px;
+  background:var(--panel);
+  border-bottom:4px solid var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+}
+
+.logo{
+  font-family:'Press Start 2P';
+  font-size:12px;
+}
+
+nav button{
+  font-family:'Press Start 2P';
+  font-size:10px;
+  margin-left:12px;
+  padding:10px 14px;
+  background:var(--panel-light);
+  border:3px solid var(--accent);
+  color:var(--ink);
+  cursor:pointer;
+}
+
+nav button:hover{
+  background:#2c474f;
+}
+
+/* DESKTOP */
+#desktop{
+  position:relative;
+  height:calc(100vh - 64px);
+  padding:30px;
+}
+
+/* PANELS */
+.panel{
+  position:absolute;
+  top:40px;
+  left:50%;
+  transform:translateX(-50%);
+  width:480px;
+  background:var(--panel);
+  border:4px solid var(--accent);
+  box-shadow:8px 8px 0 var(--shadow);
+  display:none;
+  animation:panelIn .25s steps(6) forwards;
+}
+
+@keyframes panelIn{
+  from{ transform:translate(-50%, 20px); opacity:0; }
+  to{ transform:translate(-50%, 0); opacity:1; }
+}
+
+.panel-header{
+  background:var(--panel-light);
+  padding:14px;
+  border-bottom:3px solid var(--accent);
+  font-family:'Press Start 2P';
+  font-size:11px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.panel-header span{
+  cursor:pointer;
+}
+
+.panel-body{
+  padding:18px;
+  font-size:14px;
+  line-height:1.7;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .panel{
+    width:90%;
+  }
+}
+
+/* ================= VISUAL STAGE ================= */
+#visual-stage{
+  position:absolute;
+  left:60px;
+  top:120px;
+  width:280px;
+  height:360px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none; /* UI stays clickable */
+}
+
+#visual-stage img{
+  max-width:100%;
+  max-height:100%;
+  image-rendering:pixelated;
+  animation:
+    floatIdle 3s ease-in-out infinite,
+    glowPulse 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px rgba(45,252,216,.4));
+}
+
+/* Idle float */
+@keyframes floatIdle{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-12px); }
+}
+
+/* Glow breathing */
+@keyframes glowPulse{
+  0%,100%{ filter: drop-shadow(0 0 8px rgba(45,252,216,.3)); }
+  50%{ filter: drop-shadow(0 0 16px rgba(45,252,216,.7)); }
+}
+
+/* MOBILE: hide stage */
+@media(max-width:900px){
+  #visual-stage{
+    display:none;
+  }
+}
+
+/* GAME PANEL */
+.game-panel {
+  width: 520px;
+  margin-top: 20px;
+}
+
+.game-body {
+  text-align: center;
+}
+
+#gameCanvas {
+  background: #fff;
+  border: 2px solid #000;
+  display: block;
+  margin: 0 auto;
+}
+
+/* CONTROLS */
+.game-controls {
+  margin-top: 8px;
+}
+
+.game-controls button {
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  padding: 6px 12px;
+  margin: 0 6px;
+  cursor: pointer;
+}
+
+/* MESSAGE BAR */
+#message-bar {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000080;
+  color: #fff;
+  padding: 8px 14px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  border: 2px solid #fff;
+  display: none;
+  z-index: 999;
+}
+#game-window {
+  display: none; /* Start hidden like other panels */
+  position: relative;
+}
+.panel-body a {
+  color: #00ffcc;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.panel-body a:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 5px #00ffcc;
+}

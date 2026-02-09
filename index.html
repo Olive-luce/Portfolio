@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PORTFOLIO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<img id="pet" src="assets/pet.png" alt="Student Pet"
+     style="position:absolute; width:32px; height:32px; top:100px; left:100px; z-index:999;">
+
+<!-- BOOT -->
+<div id="boot">
+  PORTFOLIO<br><br>
+  INITIALIZING SYSTEM…
+</div>
+
+<!-- TOP PANEL -->
+<header id="top-panel">
+  <div class="logo">PORTFOLIO</div>
+  <nav>
+    <button onclick="openPanel('about')">PLAYER</button>
+    <button onclick="openPanel('skills')">SKILLS</button>
+    <button onclick="openPanel('projects')">QUESTS</button>
+    <button onclick="openPanel('contact')">COMMS</button>
+    <button onclick="openPanel('game-window')">PLAY GAME</button>
+  </nav>
+</header>
+
+<!-- DESKTOP -->
+<main id="desktop">
+    
+  <!-- VISUAL STAGE -->
+    <div id="visual-stage">
+     <img src="avatar.png" alt="Player Avatar">
+    </div>
+    <!-- GAME WINDOW -->
+ <div id="game-window" class="panel game-panel">
+  <div class="panel-header">
+    📚 Student Survival.exe
+    <span onclick="quitGame()">✕</span>
+  </div>
+
+  <div class="panel-body game-body">
+    <canvas id="gameCanvas" width="480" height="160"></canvas>
+
+    <div class="game-controls">
+      <button onclick="startGame()">START</button>
+      <button onclick="quitGame()">QUIT</button>
+    </div>
+  </div>
+</div>
+
+<!-- MESSAGE BAR -->
+<div id="message-bar"></div>
+
+  <!-- PANELS -->
+  <section class="panel" id="about">
+    <div class="panel-header">
+      PLAYER STATUS
+      <span onclick="closePanel('about')">✕</span>
+    </div>
+    <div class="panel-body">
+      <b>NAME:</b> Kazi Sadat Hossain Olive<br>
+      <b>CLASS:</b> CSE Undergrad<br>
+      <b>LEVEL:</b> INFINITY<br><br>
+      Builder of interactive systems, creative UIs,
+      2D videogames and playful retro-inspired experiences.
+      I’m a curious and detail-oriented developer with a strong 
+      interest in building practical, user-focused digital experiences.
+      I enjoy working across both front-end and back-end systems, experimenting 
+      with UI/UX, and turning ideas into clean, functional solutions.
+      I’m always learning, improving, and looking for better ways to solve real-world problems
+      with technology.
+    </div>
+  </section>
+
+  <section class="panel" id="skills">
+    <div class="panel-header">
+      SKILL TREE
+      <span onclick="closePanel('skills')">✕</span>
+    </div>
+    <div class="panel-body">
+      ▸ UI / UX DESIGN<br>
+      ▸ GAME DEVELOPMENT<br>
+      ▸ JAVA/JAVASCRIPT<br>
+      ▸ PYTHON<br>
+      ▸ WEB ANIMATION<br>
+      ▸ ANALYTICAL SKILLS & RESEARCH<br>
+      ▸ CREATIVE SYSTEMS
+    </div>
+  </section>
+
+  <section class="panel" id="projects">
+    <div class="panel-header">
+      QUEST LOG
+      <span onclick="closePanel('projects')">✕</span>
+    </div>
+    <div class="panel-body">
+      ✔ RETRO GAME PORTFOLIO<br>
+      ✔ DATA ANALYSIS AND VISUALIZATION REPORTS<br>
+      ✔ WEB DEVELOPMENT<br>
+      ✔ DATA DASHBOARD<br>
+      ✔ GAME UI SYSTEM
+    </div>
+  </section>
+
+  <section class="panel" id="contact">
+    <div class="panel-header">
+      COMM CHANNEL
+      <span onclick="closePanel('contact')">✕</span>
+    </div>
+    <div class="panel-body">
+  <strong>EMAIL:</strong>
+  <a href="mailto:kazisadath@gmail.com">kazisadath@gmail.com</a><br>
+
+  <strong>GITHUB:</strong>
+  <a href="https://github.com/Olive-luce" target="_blank">
+    github.com/Olive-luce
+  </a><br>
+
+  <strong>LINKEDIN:</strong>
+  <a href="https://www.linkedin.com/in/kazi-sadat-hossain-70b65b2b6" target="_blank">
+    /in/kazi-sadat-hossain
+  </a><br><br>
+
+  CONTACT FOR COLLABS, QUESTIONS, OR JUST TO CHAT ABOUT TECH AND GAMES!
+</div>
+
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
