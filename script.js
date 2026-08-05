@@ -5,13 +5,19 @@ let frame = 0;
 let score = 0;
 let obstacles = [];
 let messageTimeout;
+let openPanelId = null;
+
+const BOOT_MS = 3200;
+const GROUND_Y = 110;
+const JUMP_VELOCITY = -12;
+const GRAVITY = 0.8;
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const student = {
   x: 40,
-  y: 110,
+  y: GROUND_Y,
   w: 32,
   h: 32,
   vy: 0,
@@ -21,8 +27,7 @@ const student = {
 // Scrollable background
 const bg = {
   x: 0,
-  speed: 2,
-  img: null
+  speed: 2
 };
 
 // Load images
@@ -30,16 +35,21 @@ const images = {};
 
 function loadImages(callback) {
   const toLoad = ["student", "exam", "assignment", "lab", "background"];
-  let loaded = 0;
+  let settled = 0;
+
+  const done = () => {
+    settled++;
+    if (settled === toLoad.length) callback();
+  };
 
   toLoad.forEach(name => {
     const img = new Image();
-    img.src = `assets/${name}.png`; // Make sure these exist
     img.onload = () => {
       images[name] = img;
-      loaded++;
-      if (loaded === toLoad.length) callback();
+      done();
     };
+    img.onerror = done; // missing asset falls back to a solid rectangle
+    img.src = `assets/${name}.png`;
   });
 }
 
@@ -62,50 +72,79 @@ function openPanel(id) {
   const panel = document.getElementById(id);
   panel.style.display = 'block';
   panel.style.zIndex = ++z;
+  openPanelId = id;
 }
 
 function closePanel(id) {
   document.getElementById(id).style.display = 'none';
+  if (openPanelId === id) openPanelId = null;
+  if (id === 'game-window') stopGame();
 }
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && openPanelId) closePanel(openPanelId);
+});
 
 // Start the game
 window.startGame = function () {
-  if (running) return;
+  cancelAnimationFrame(animationId);
   obstacles = [];
   frame = 0;
   score = 0;
   running = true;
-  student.y = 110;
+  student.y = GROUND_Y;
   student.vy = 0;
+  student.jumping = false;
   bg.x = 0;
-  bg.speed = 2;
   showMessage("📖 Semester Started!");
   loop();
 };
 
-// Quit game
-window.quitGame = function () {
+function stopGame() {
   running = false;
   cancelAnimationFrame(animationId);
+}
+
+// Quit game
+window.quitGame = function () {
+  stopGame();
   showMessage("💾 Game Closed");
   document.getElementById('game-window').style.display = 'none';
+  if (openPanelId === 'game-window') openPanelId = null;
 };
 
-// Jump
+function gameOver() {
+  stopGame();
+  showMessage(`❌ Semester Failed! Credits: ${score}`, 3000);
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.font = "14px monospace";
+  ctx.fillText("SEMESTER FAILED", canvas.width / 2, canvas.height / 2 - 8);
+  ctx.font = "10px monospace";
+  ctx.fillText(`CREDITS: ${score} — PRESS START TO RETRY`, canvas.width / 2, canvas.height / 2 + 12);
+  ctx.textAlign = "left";
+}
+
+function jump() {
+  if (!running || student.jumping) return;
+  student.vy = JUMP_VELOCITY;
+  student.jumping = true;
+}
+
 // Jump on spacebar
 document.addEventListener("keydown", e => {
-  if (e.code === "Space" && !student.jumping && running) {
-    student.vy = -12;
-    student.jumping = true;
+  if (e.code === "Space" && running) {
+    e.preventDefault();
+    jump();
   }
 });
 
-// Jump on left mouse click
-document.addEventListener("mousedown", e => {
-  if (e.button === 0 && !student.jumping && running) { // 0 = left button
-    student.vy = -12;
-    student.jumping = true;
-  }
+// Jump on left click inside the game screen only
+canvas.addEventListener("mousedown", e => {
+  if (e.button === 0) jump();
 });
 
 // Spawn obstacles
@@ -137,10 +176,11 @@ function loop() {
   }
 
   // --- Student physics ---
-  student.vy += 0.8;
+  student.vy += GRAVITY;
   student.y += student.vy;
-  if (student.y >= 110) {
-    student.y = 110;
+  if (student.y >= GROUND_Y) {
+    student.y = GROUND_Y;
+    student.vy = 0;
     student.jumping = false;
   }
 
@@ -155,7 +195,8 @@ function loop() {
   // --- Obstacles ---
   if (frame % 90 === 0) spawnObstacle();
 
-  obstacles.forEach((o, i) => {
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    const o = obstacles[i];
     o.x -= bg.speed + 2; // move faster than background
 
     // Draw obstacle image
@@ -173,8 +214,8 @@ function loop() {
       student.y < o.y + o.h &&
       student.y + student.h > o.y
     ) {
-      running = false;
-      showMessage("❌ Semester Failed!");
+      gameOver();
+      return;
     }
 
     // Remove offscreen
@@ -183,7 +224,7 @@ function loop() {
       score++;
       showMessage("✅ Task Survived!", 800);
     }
-  });
+  }
 
   // --- HUD ---
   ctx.font = "10px monospace";
@@ -195,7 +236,7 @@ function loop() {
 
 // --- Load all images first ---
 loadImages(() => {
-  console.log("All game images loaded!");
+  console.log("Game images ready!");
 });
 
 const messages = [
@@ -207,78 +248,68 @@ const messages = [
 
 function randomPopup() {
   const msg = messages[Math.floor(Math.random() * messages.length)];
-  showMessage(msg, 1500); // reuse your existing message bar
-  setTimeout(randomPopup, 5000 + Math.random()*5000); // 5-10s random interval
+  showMessage(msg, 1500);
+  setTimeout(randomPopup, 5000 + Math.random() * 5000); // 5-10s random interval
 }
 
-randomPopup();
+// Wait for the boot screen to clear before nagging the visitor
+setTimeout(randomPopup, BOOT_MS);
 
 const visualStage = document.getElementById('visual-stage');
 
 function createSparkle() {
+  if (!visualStage.offsetWidth) return; // stage hidden on small screens
+
   const sparkle = document.createElement('div');
-  sparkle.style.position = 'absolute';
-  sparkle.style.width = '4px';
-  sparkle.style.height = '4px';
-  sparkle.style.background = '#FFD700';
-  sparkle.style.borderRadius = '50%';
+  sparkle.className = 'sparkle';
   sparkle.style.left = Math.random() * (visualStage.offsetWidth - 4) + 'px';
   sparkle.style.top = Math.random() * (visualStage.offsetHeight - 4) + 'px';
+  sparkle.addEventListener('animationend', () => sparkle.remove());
   visualStage.appendChild(sparkle);
-
-  setTimeout(() => sparkle.remove(), 1000); // fade after 1s
 }
 
-// continuously spawn sparkles
 setInterval(createSparkle, 300);
 
 const pet = document.getElementById('pet');
-let petX = 100; // initial position
+let petX = 100;
 let petY = 100;
-let petSpeed = 1.5;
+const petSpeed = 1.5;
 
-// Choose a random target position within window
+pet.addEventListener('click', () => showMessage("👋 Give me 5 marks as compensation!"));
+
+// Choose a random target position, keeping the pet clear of the top panel
 function getRandomTarget() {
-  const x = Math.random() * (window.innerWidth - 32);
-  const y = Math.random() * (window.innerHeight - 32);
-  return {x, y};
+  const topPanelHeight = document.getElementById('top-panel').offsetHeight;
+  const x = Math.random() * Math.max(window.innerWidth - 32, 0);
+  const y = topPanelHeight + Math.random() * Math.max(window.innerHeight - topPanelHeight - 32, 0);
+  return { x, y };
 }
 
 let target = getRandomTarget();
 
+function moveAxis(current, goal) {
+  if (Math.abs(goal - current) < petSpeed) return goal;
+  return current < goal ? current + petSpeed : current - petSpeed;
+}
+
 // Animate pet towards target
 function animatePet() {
-  // Move X
-  if (Math.abs(target.x - petX) < petSpeed) {
-    petX = target.x;
-  } else if (petX < target.x) {
-    petX += petSpeed;
-  } else {
-    petX -= petSpeed;
-  }
+  petX = moveAxis(petX, target.x);
+  petY = moveAxis(petY, target.y);
 
-  // Move Y
-  if (Math.abs(target.y - petY) < petSpeed) {
-    petY = target.y;
-  } else if (petY < target.y) {
-    petY += petSpeed;
-  } else {
-    petY -= petSpeed;
-  }
-
-  // Apply new position
   pet.style.left = petX + 'px';
   pet.style.top = petY + 'px';
 
-  // If reached target, pick a new random target
   if (petX === target.x && petY === target.y) {
     target = getRandomTarget();
   }
 
   requestAnimationFrame(animatePet);
-  pet.addEventListener('click', () => showMessage("👋 Give me 5 marks as compensation!"));
-
 }
 
 // Start roaming
 animatePet();
+
+window.addEventListener('resize', () => {
+  target = getRandomTarget();
+});
