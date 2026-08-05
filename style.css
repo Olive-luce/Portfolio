@@ -5,6 +5,7 @@
   --ink:#e6f6f1;
   --accent:#2dfcd8;
   --shadow:#000;
+  --header-h:64px;
 }
 
 /* RESET */
@@ -114,7 +115,7 @@ nav button:focus-visible,
 /* DESKTOP */
 #desktop{
   position:relative;
-  min-height:calc(100vh - 64px);
+  min-height:calc(100vh - var(--header-h));
   padding:30px;
 }
 
@@ -125,7 +126,7 @@ nav button:focus-visible,
   left:50%;
   transform:translateX(-50%);
   width:min(480px, calc(100vw - 40px));
-  max-height:calc(100vh - 140px);
+  max-height:calc(100vh - var(--header-h) - 90px);
   overflow-y:auto;
   background:var(--panel);
   border:4px solid var(--accent);

@@ -277,9 +277,19 @@ const petSpeed = 1.5;
 
 pet.addEventListener('click', () => showMessage("👋 Give me 5 marks as compensation!"));
 
+const topPanel = document.getElementById('top-panel');
+
+// Panel sizing depends on the header, which grows when the nav wraps
+function syncHeaderHeight() {
+  document.documentElement.style.setProperty('--header-h', topPanel.offsetHeight + 'px');
+}
+
+syncHeaderHeight();
+window.addEventListener('load', syncHeaderHeight); // web fonts can change the header height
+
 // Choose a random target position, keeping the pet clear of the top panel
 function getRandomTarget() {
-  const topPanelHeight = document.getElementById('top-panel').offsetHeight;
+  const topPanelHeight = topPanel.offsetHeight;
   const x = Math.random() * Math.max(window.innerWidth - 32, 0);
   const y = topPanelHeight + Math.random() * Math.max(window.innerHeight - topPanelHeight - 32, 0);
   return { x, y };
@@ -311,5 +321,6 @@ function animatePet() {
 animatePet();
 
 window.addEventListener('resize', () => {
+  syncHeaderHeight();
   target = getRandomTarget();
 });
