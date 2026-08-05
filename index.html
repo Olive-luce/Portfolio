@@ -138,6 +138,37 @@
 
 </main>
 
+<!-- WEATHER DOCK -->
+<aside id="weather-dock" aria-label="Live weather">
+  <canvas id="weatherCanvas" width="120" height="56" aria-label="Animated pixel art weather scene"></canvas>
+
+  <div class="weather-readout">
+    <div class="weather-headline">
+      <span id="weather-temp">--°C</span>
+      <span id="weather-condition">SCANNING…</span>
+    </div>
+    <div id="weather-place" class="weather-place">DHAKA, BANGLADESH</div>
+
+    <dl class="weather-stats">
+      <div><dt>FEELS</dt><dd id="weather-feels">--</dd></div>
+      <div><dt>HUMIDITY</dt><dd id="weather-humidity">--</dd></div>
+      <div><dt>WIND</dt><dd id="weather-wind">--</dd></div>
+      <div><dt>CYCLE</dt><dd id="weather-cycle">--</dd></div>
+    </dl>
+  </div>
+
+  <div class="weather-side">
+    <form id="weather-search" class="weather-controls">
+      <label class="visually-hidden" for="weather-query">City name</label>
+      <input id="weather-query" type="text" placeholder="CITY…" autocomplete="off">
+      <button type="submit">SCAN</button>
+      <button type="button" id="weather-reset">BD</button>
+    </form>
+    <p id="weather-status" class="weather-status">STANDBY</p>
+  </div>
+</aside>
+
 <script src="script.js"></script>
+<script src="weather.js"></script>
 </body>
 </html>

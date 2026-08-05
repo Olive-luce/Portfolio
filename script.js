@@ -66,6 +66,8 @@ function showMessage(text, time = 2000) {
 
 // Open / close panels
 function openPanel(id) {
+  if (openPanelId && openPanelId !== id) closePanel(openPanelId); // stops the game loop if it was running
+
   document.querySelectorAll('.panel').forEach(p => {
     p.style.display = 'none';
   });
