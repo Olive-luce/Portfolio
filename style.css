@@ -288,6 +288,124 @@ nav button:focus-visible,
   cursor: pointer;
 }
 
+/* WEATHER PANEL */
+.weather-panel {
+  width: min(420px, calc(100vw - 40px));
+}
+
+.weather-body {
+  font-family: "Press Start 2P", monospace;
+  font-size: 9px;
+  line-height: 1.8;
+}
+
+#weatherCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 120 / 56;
+  border: 3px solid var(--accent);
+  image-rendering: pixelated;
+  background: #6fd3f5;
+}
+
+.weather-headline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+#weather-temp {
+  font-size: 22px;
+  color: var(--accent);
+}
+
+#weather-condition {
+  font-size: 9px;
+  text-align: right;
+}
+
+.weather-place {
+  font-size: 8px;
+  opacity: .75;
+  margin-bottom: 12px;
+}
+
+.weather-stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0 0 14px;
+  padding: 10px;
+  background: var(--panel-light);
+  border: 2px solid #2c474f;
+  font-size: 8px;
+}
+
+.weather-stats dt {
+  opacity: .7;
+}
+
+.weather-stats dd {
+  margin: 0;
+  color: var(--accent);
+}
+
+.weather-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.weather-controls input {
+  flex: 1 1 90px;
+  min-width: 0;
+  padding: 8px;
+  background: #0d1a1d;
+  border: 2px solid var(--accent);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 8px;
+}
+
+.weather-controls button {
+  padding: 8px 10px;
+  background: var(--panel-light);
+  border: 2px solid var(--accent);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+.weather-controls button:hover {
+  background: #2c474f;
+}
+
+.weather-controls input:focus-visible,
+.weather-controls button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.weather-status {
+  margin: 12px 0 0;
+  font-size: 7px;
+  color: var(--accent);
+  opacity: .8;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* MESSAGE BAR */
 #message-bar {
   position: fixed;

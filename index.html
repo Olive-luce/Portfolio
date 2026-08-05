@@ -28,6 +28,7 @@
     <button onclick="openPanel('skills')">SKILLS</button>
     <button onclick="openPanel('projects')">QUESTS</button>
     <button onclick="openPanel('contact')">COMMS</button>
+    <button onclick="openPanel('weather-window')">WEATHER</button>
     <button onclick="openPanel('game-window')">PLAY GAME</button>
   </nav>
 </header>
@@ -56,6 +57,40 @@
         <button onclick="startGame()">START</button>
         <button onclick="quitGame()">QUIT</button>
       </div>
+    </div>
+  </div>
+
+  <!-- WEATHER WINDOW -->
+  <div id="weather-window" class="panel weather-panel">
+    <div class="panel-header">
+      🌦 Weather.exe
+      <button type="button" class="panel-close" aria-label="Close weather" onclick="closePanel('weather-window')">✕</button>
+    </div>
+
+    <div class="panel-body weather-body">
+      <canvas id="weatherCanvas" width="120" height="56" aria-label="Animated pixel art weather scene"></canvas>
+
+      <div class="weather-headline">
+        <span id="weather-temp">--°C</span>
+        <span id="weather-condition">SCANNING…</span>
+      </div>
+      <div id="weather-place" class="weather-place">LOCATING…</div>
+
+      <dl class="weather-stats">
+        <dt>FEELS</dt><dd id="weather-feels">--</dd>
+        <dt>HUMIDITY</dt><dd id="weather-humidity">--</dd>
+        <dt>WIND</dt><dd id="weather-wind">--</dd>
+        <dt>CYCLE</dt><dd id="weather-cycle">--</dd>
+      </dl>
+
+      <form id="weather-search" class="weather-controls">
+        <label class="visually-hidden" for="weather-query">City name</label>
+        <input id="weather-query" type="text" placeholder="CITY…" autocomplete="off">
+        <button type="submit">SCAN</button>
+        <button type="button" id="weather-locate">MY SPOT</button>
+      </form>
+
+      <p id="weather-status" class="weather-status">STANDBY</p>
     </div>
   </div>
 
@@ -139,5 +174,6 @@
 </main>
 
 <script src="script.js"></script>
+<script src="weather.js"></script>
 </body>
 </html>
