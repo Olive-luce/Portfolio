@@ -6,6 +6,7 @@
   --accent:#2dfcd8;
   --shadow:#000;
   --header-h:64px;
+  --dock-h:120px;
 }
 
 /* RESET */
@@ -19,7 +20,7 @@ body{
   background:radial-gradient(circle at top, #163036, var(--bg));
   color:var(--ink);
   font-family:'Inter', sans-serif;
-  overflow:hidden;
+  overflow-x:hidden;
 }
 
 /* CRT SCANLINES */
@@ -116,7 +117,7 @@ nav button:focus-visible,
 #desktop{
   position:relative;
   min-height:calc(100vh - var(--header-h));
-  padding:30px;
+  padding:30px 30px calc(var(--dock-h) + 30px);
 }
 
 /* PANELS */
@@ -126,7 +127,7 @@ nav button:focus-visible,
   left:50%;
   transform:translateX(-50%);
   width:min(480px, calc(100vw - 40px));
-  max-height:calc(100vh - var(--header-h) - 90px);
+  max-height:calc(100vh - var(--header-h) - var(--dock-h) - 80px);
   overflow-y:auto;
   background:var(--panel);
   border:4px solid var(--accent);
@@ -183,11 +184,49 @@ nav button:focus-visible,
 
   #desktop{
     min-height:auto;
-    padding:20px 12px;
+    padding:20px 12px calc(var(--dock-h) + 20px);
+  }
+
+  /* panels join the page flow so the document scrolls instead of clipping them */
+  .panel{
+    position:static;
+    transform:none;
+    width:100%;
+    max-height:none;
+    overflow:visible;
+    margin:0 auto 20px;
+    animation:none;
   }
 
   #pet{
     display:none;
+  }
+}
+
+/* DOCK: stack on narrow screens */
+@media(max-width:760px){
+  :root{
+    --dock-h:210px;
+  }
+
+  #weather-dock{
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+  }
+
+  #weatherCanvas{
+    width:100%;
+    height:auto;
+    aspect-ratio:120 / 56;
+  }
+
+  .weather-side{
+    flex:1 1 100%;
+  }
+
+  .weather-status{
+    text-align:left;
   }
 }
 
@@ -288,60 +327,70 @@ nav button:focus-visible,
   cursor: pointer;
 }
 
-/* WEATHER PANEL */
-.weather-panel {
-  width: min(420px, calc(100vw - 40px));
-}
-
-.weather-body {
+/* WEATHER DOCK */
+#weather-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: var(--dock-h);
+  padding: 12px 20px;
+  background: var(--panel);
+  border-top: 4px solid var(--accent);
+  box-shadow: 0 -6px 0 rgba(0,0,0,.35);
   font-family: "Press Start 2P", monospace;
-  font-size: 9px;
-  line-height: 1.8;
 }
 
 #weatherCanvas {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 120 / 56;
+  flex: 0 0 auto;
+  width: 180px;
+  height: 84px;
   border: 3px solid var(--accent);
   image-rendering: pixelated;
   background: #6fd3f5;
 }
 
+.weather-readout {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
 .weather-headline {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 12px;
 }
 
 #weather-temp {
-  font-size: 22px;
+  font-size: 20px;
   color: var(--accent);
 }
 
 #weather-condition {
   font-size: 9px;
-  text-align: right;
 }
 
 .weather-place {
   font-size: 8px;
   opacity: .75;
-  margin-bottom: 12px;
+  margin: 6px 0 10px;
 }
 
 .weather-stats {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 12px;
-  margin: 0 0 14px;
-  padding: 10px;
-  background: var(--panel-light);
-  border: 2px solid #2c474f;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0;
   font-size: 8px;
+}
+
+.weather-stats div {
+  display: flex;
+  gap: 6px;
 }
 
 .weather-stats dt {
@@ -351,6 +400,10 @@ nav button:focus-visible,
 .weather-stats dd {
   margin: 0;
   color: var(--accent);
+}
+
+.weather-side {
+  flex: 0 0 auto;
 }
 
 .weather-controls {
@@ -391,7 +444,8 @@ nav button:focus-visible,
 }
 
 .weather-status {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
+  text-align: right;
   font-size: 7px;
   color: var(--accent);
   opacity: .8;
@@ -409,7 +463,7 @@ nav button:focus-visible,
 /* MESSAGE BAR */
 #message-bar {
   position: fixed;
-  bottom: 12px;
+  bottom: calc(var(--dock-h) + 12px);
   left: 50%;
   transform: translateX(-50%);
   background: #000080;

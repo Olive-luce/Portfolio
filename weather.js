@@ -1,10 +1,10 @@
-/* WEATHER.EXE — live weather in a pixel-art window.
+/* WEATHER — live weather in the pixel-art dock at the bottom of the desktop.
    Data: Open-Meteo (no API key). Scene is drawn on a tiny canvas and scaled
    up with image-rendering:pixelated so every "pixel" is a chunky block. */
 
-const WEATHER_STORAGE_KEY = 'portfolio.weather.place';
 const WEATHER_REFRESH_MS = 10 * 60 * 1000;
 const DEFAULT_PLACE = { name: 'Dhaka', country: 'Bangladesh', latitude: 23.7104, longitude: 90.40744 };
+const DHAKA_LABEL = `${DEFAULT_PLACE.name}, ${DEFAULT_PLACE.country}`;
 
 // WMO weather codes -> label + which animation to play
 const WEATHER_CODES = {
@@ -262,7 +262,7 @@ function renderReadout(place, current) {
   isDay = current.is_day === 1;
 
   document.getElementById('weather-place').textContent =
-    place.country ? `${place.name}, ${place.country}` : place.name;
+    (place.country ? `${place.name}, ${place.country}` : place.name).toUpperCase();
   document.getElementById('weather-temp').textContent = `${Math.round(current.temperature_2m)}°C`;
   document.getElementById('weather-condition').textContent = label.toUpperCase();
   document.getElementById('weather-feels').textContent = `${Math.round(current.apparent_temperature)}°C`;
@@ -287,7 +287,6 @@ async function fetchWeather(place) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     currentPlace = place;
-    localStorage.setItem(WEATHER_STORAGE_KEY, JSON.stringify(place));
     renderReadout(place, data.current);
   } catch (err) {
     setStatus('SIGNAL LOST — RETRY LATER');
@@ -314,41 +313,14 @@ async function searchPlace(query) {
   }
 }
 
-function storedPlace() {
-  try {
-    const raw = localStorage.getItem(WEATHER_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function locateAndLoad() {
-  const remembered = storedPlace();
-  if (remembered) {
-    fetchWeather(remembered);
-    return;
-  }
-
-  if (!navigator.geolocation) {
-    fetchWeather(DEFAULT_PLACE);
-    return;
-  }
-
-  setStatus('PINGING YOUR COORDINATES…');
-  navigator.geolocation.getCurrentPosition(
-    pos => fetchWeather({ name: 'Your Location', country: '', latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-    () => fetchWeather(DEFAULT_PLACE),
-    { timeout: 8000 }
-  );
-}
-
 // ---------- wiring ----------
 
 seedScene();
-drawScene(); // paint a first frame so the window is never blank
+document.getElementById('weather-place').textContent = DHAKA_LABEL.toUpperCase();
 
-document.getElementById('weather-search').addEventListener('submit', e => {
+const searchForm = document.getElementById('weather-search');
+
+searchForm.addEventListener('submit', e => {
   e.preventDefault();
   const input = document.getElementById('weather-query');
   const query = input.value.trim();
@@ -357,26 +329,26 @@ document.getElementById('weather-search').addEventListener('submit', e => {
   input.value = '';
 });
 
-document.getElementById('weather-locate').addEventListener('click', () => {
-  localStorage.removeItem(WEATHER_STORAGE_KEY);
-  locateAndLoad();
+// "BD" jumps back to the Bangladesh default
+document.getElementById('weather-reset').addEventListener('click', () => fetchWeather(DEFAULT_PLACE));
+
+// The dock is always on screen, so only pause while the tab is in the background
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopScene();
+    clearInterval(refreshTimer);
+  } else {
+    startScene();
+    startRefreshTimer();
+    if (currentPlace) fetchWeather(currentPlace);
+  }
 });
 
-document.addEventListener('panel:open', e => {
-  if (e.detail !== 'weather-window') return;
-
-  startScene();
-  if (!currentPlace) {
-    locateAndLoad();
-  } else {
-    fetchWeather(currentPlace);
-  }
+function startRefreshTimer() {
   clearInterval(refreshTimer);
   refreshTimer = setInterval(() => currentPlace && fetchWeather(currentPlace), WEATHER_REFRESH_MS);
-});
+}
 
-document.addEventListener('panel:close', e => {
-  if (e.detail !== 'weather-window') return;
-  stopScene();
-  clearInterval(refreshTimer);
-});
+startScene();
+startRefreshTimer();
+fetchWeather(DEFAULT_PLACE); // Bangladesh on every load; the city input takes it anywhere

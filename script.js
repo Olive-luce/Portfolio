@@ -64,15 +64,9 @@ function showMessage(text, time = 2000) {
   }, time);
 }
 
-// Panels announce themselves so windows with their own loops (game, weather)
-// can start and stop work only while they are visible
-function notifyPanel(type, id) {
-  document.dispatchEvent(new CustomEvent(type, { detail: id }));
-}
-
 // Open / close panels
 function openPanel(id) {
-  if (openPanelId && openPanelId !== id) closePanel(openPanelId);
+  if (openPanelId && openPanelId !== id) closePanel(openPanelId); // stops the game loop if it was running
 
   document.querySelectorAll('.panel').forEach(p => {
     p.style.display = 'none';
@@ -81,14 +75,12 @@ function openPanel(id) {
   panel.style.display = 'block';
   panel.style.zIndex = ++z;
   openPanelId = id;
-  notifyPanel('panel:open', id);
 }
 
 function closePanel(id) {
   document.getElementById(id).style.display = 'none';
   if (openPanelId === id) openPanelId = null;
   if (id === 'game-window') stopGame();
-  notifyPanel('panel:close', id);
 }
 
 document.addEventListener("keydown", e => {
@@ -121,7 +113,6 @@ window.quitGame = function () {
   showMessage("💾 Game Closed");
   document.getElementById('game-window').style.display = 'none';
   if (openPanelId === 'game-window') openPanelId = null;
-  notifyPanel('panel:close', 'game-window');
 };
 
 function gameOver() {
